@@ -9,6 +9,16 @@
             "projectName": "spring-response",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-SpringMybatisApplication<spring-mybatis>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.aloha.spring_mybatis.SpringMybatisApplication",
+            "projectName": "spring-mybatis",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }
