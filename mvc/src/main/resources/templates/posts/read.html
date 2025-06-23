@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 조회</title>
+</head>
+<body>
+    <h1>게시글 조회</h1>
+    <form th:action="@{/posts/create}" method="post" th:object="${post}"
+            enctype="multipart/form-data">
+        <table border="1">
+            <tr>
+                <td>제목</td>
+                <td>
+                    <input type="text" th:field="*{title}">
+                    <!-- <input type="text" id="title" name="title" th:value="*{title}"> -->
+                </td>
+            </tr>
+            <tr>
+                <td>작성자</td>
+                <td>
+                    <input type="text" th:field="*{writer}">
+                </td>
+            </tr>
+            <tr>
+                <td>내용</td>
+                <td>
+                    <textarea th:field="*{content}" rows="5" cols="40"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" align="right">
+                    <button type="button" onclick="location.href='/posts/list'">목록</button>
+                    <button type="button" 
+                        th:onclick="location.href='/posts/update/' + [[${post.no}]]">수정</button>
+                </td>
+            </tr>
+    
+        </table>
+
+    </form>
+</body>
+</html>

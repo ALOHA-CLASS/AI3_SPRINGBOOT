@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 등록</title>
+</head>
+<body>
+    <h1>게시글 등록</h1>
+    <form th:action="@{/posts/create}" method="post" th:object="${post}"
+            enctype="multipart/form-data">
+        <table border="1">
+            <tr>
+                <td>제목</td>
+                <td>
+                    <input type="text" th:field="*{title}">
+                </td>
+            </tr>
+            <tr>
+                <td>작성자</td>
+                <td>
+                    <input type="text" th:field="*{writer}">
+                </td>
+            </tr>
+            <tr>
+                <td>내용</td>
+                <td>
+                    <textarea th:field="*{content}" rows="5" cols="40"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" align="right">
+                    <button type="submit">등록</button>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" align="right">
+                    <button type="button" onclick="create()">등록</button>
+                    <button type="button" onclick="createAsync()">등록</button>
+                </td>
+            </tr>
+    
+        </table>
+
+    </form>
+
+    <script>
+        /*
+            AJAX
+            [POST] 
+            - /posts
+            - data : JSON
+        */
+        // AJAX : XMLHttpRequest, fetch(), $.ajax(), axios
+
+        function create() {
+            const data = {
+                title : document.getElementById("title").value,
+                writer : document.getElementById("writer").value,
+                content : document.getElementById("content").value
+            }
+
+            // 비동기 요청
+            const url = `/posts`
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type" : "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            // 요청 성공 시
+            // .then( 성공 시 콜백함수 )
+            .then( (response) => {
+                console.log(response);
+                if( !response.ok ) {
+                    alert("데이터 등록 실패")
+                    return
+                }
+                // 응답 메시지
+                // JSON : response.json()
+                // TEXT : response.text()
+                return response.text()
+            })
+            .then(result => {
+                alert(result)
+                alert("데이터 등록 성공")
+                location.href = `/posts/list`
+            })
+            // 요청 실패 시
+            // .catch( 실패 시 콜백함수 )
+            .catch( err => {
+                console.log(err);
+            })
+        }
+
+        async function createAsync() {
+            const data = {
+                title : document.getElementById("title").value,
+                writer : document.getElementById("writer").value,
+                content : document.getElementById("content").value
+            }
+
+            // 비동기 요청
+            const url = `/posts`
+            try {
+                const response = await fetch(url, {
+                                            method: "POST",
+                                            headers: {
+                                                "Content-Type" : "application/json"
+                                            },
+                                            body: JSON.stringify(data)
+                                        })
+                if( !response.ok ) {
+                    alert(`데이터 등록 실패`)
+                    return
+                }
+                const result = await response.text()
+                alert(result)
+                alert(`데이터 등록 성공`)
+                location.href = `/posts/list`
+            } catch (error) {
+                alert(`데이터 등록 실패`)
+                console.error(error)
+            }
+           
+        }
+    </script>
+</body>
+</html>
