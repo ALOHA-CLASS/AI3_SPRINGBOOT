@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.aloha.page.domain.Pagination;
 import com.aloha.page.domain.Posts;
@@ -35,6 +36,15 @@ public class PostController {
         List<Posts> list = postService.page(pagination);
         model.addAttribute("pagination", pagination);
         model.addAttribute("list", list);
+
+        // Uri 빌더
+        String pageUri = UriComponentsBuilder.fromPath("/posts/list")
+                                            //  .queryParam("page", pagination.getPage())
+                                             .queryParam("size", pagination.getSize())
+                                             .queryParam("count", pagination.getCount())
+                                             .build()
+                                             .toUriString();
+        model.addAttribute("pageUri", pageUri);
         return "posts/list";
 
     }

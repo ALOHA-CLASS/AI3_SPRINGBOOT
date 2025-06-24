@@ -23,8 +23,8 @@ import lombok.Data;
 public class Pagination {
     // 페이징 기본값
     private static final long PAGE = 1;         // 현재 페이지 번호 기본값
-    private static final long SIZE = 1;         // 페이지당 데이터 수 기본값
-    private static final long COUNT = 1;        // 노출 페이지 수 기본값
+    private static final long SIZE = 10;        // 페이지당 데이터 수 기본값
+    private static final long COUNT = 10;       // 노출 페이지 수 기본값
 
     // ✅ 필수 정보
     private long page;          // 현재 번호
