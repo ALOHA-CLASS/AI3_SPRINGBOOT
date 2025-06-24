@@ -69,6 +69,16 @@
             "projectName": "swagger",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-PageApplication<page>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.aloha.page.PageApplication",
+            "projectName": "page",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }
