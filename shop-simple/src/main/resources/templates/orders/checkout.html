@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main_layout}">
+<head>
+    <title>주문서</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="page-head">
+        <h2 class="page-title">CHECKOUT</h2>
+        <p class="page-desc">주문서 작성</p>
+    </div>
+
+    <div class="checkout">
+        <!-- 주문 상품 -->
+        <section class="checkout-items">
+            <h3 class="sub-title">주문 상품</h3>
+            <ul class="order-line" th:if="${directProduct == null}">
+                <li th:each="item : ${items}">
+                    <img th:src="${item.product.imageUrl}" th:alt="${item.product.name}" class="cart-thumb">
+                    <span class="ol-name" th:text="${item.product.name}">상품명</span>
+                    <span class="ol-qty" th:text="'x' + ${item.quantity}">x1</span>
+                    <span class="ol-price"
+                          th:text="${#numbers.formatInteger(item.product.price * item.quantity, 0, 'COMMA')} + '원'">0원</span>
+                </li>
+            </ul>
+            <ul class="order-line" th:if="${directProduct != null}">
+                <li>
+                    <img th:src="${directProduct.imageUrl}" th:alt="${directProduct.name}" class="cart-thumb">
+                    <span class="ol-name" th:text="${directProduct.name}">상품명</span>
+                    <span class="ol-qty" th:text="'x' + ${directQuantity}">x1</span>
+                    <span class="ol-price"
+                          th:text="${#numbers.formatInteger(directProduct.price * directQuantity, 0, 'COMMA')} + '원'">0원</span>
+                </li>
+            </ul>
+            <p class="total">결제 예정금액 <b th:text="${#numbers.formatInteger(totalPrice, 0, 'COMMA')} + '원'">0원</b></p>
+        </section>
+
+        <!-- 배송지 -->
+        <section class="checkout-form">
+            <h3 class="sub-title">배송지 정보</h3>
+
+            <div class="saved-address" th:if="${!#lists.isEmpty(addresses)}">
+                <p class="hint">저장된 배송지 선택</p>
+                <ul>
+                    <li th:each="a : ${addresses}">
+                        <button type="button" class="addr-pick"
+                                th:data-receiver="${a.receiver}"
+                                th:data-phone="${a.phone}"
+                                th:data-zipcode="${a.zipcode}"
+                                th:data-address1="${a.address1}"
+                                th:data-address2="${a.address2}">
+                            <b th:text="${a.receiver}">받는분</b>
+                            <span th:text="${a.address1}">주소</span>
+                            <em th:if="${a.defaultAddress}">기본</em>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <form th:action="@{/orders}" th:object="${orderForm}" method="post" class="form">
+                <input type="hidden" name="productNo" th:if="${directProduct != null}" th:value="${directProduct.no}">
+                <input type="hidden" name="quantity" th:if="${directProduct != null}" th:value="${directQuantity}">
+                <div class="field">
+                    <label>받는 분</label>
+                    <input type="text" th:field="*{receiver}">
+                    <span class="err" th:errors="*{receiver}"></span>
+                </div>
+                <div class="field">
+                    <label>연락처</label>
+                    <input type="text" th:field="*{phone}">
+                    <span class="err" th:errors="*{phone}"></span>
+                </div>
+                <div class="field">
+                    <label>우편번호</label>
+                    <input type="text" th:field="*{zipcode}">
+                </div>
+                <div class="field">
+                    <label>기본주소</label>
+                    <input type="text" th:field="*{address1}">
+                    <span class="err" th:errors="*{address1}"></span>
+                </div>
+                <div class="field">
+                    <label>상세주소</label>
+                    <input type="text" th:field="*{address2}">
+                </div>
+                <button type="submit" class="btn-fill big">결제하기</button>
+            </form>
+        </section>
+    </div>
+
+    <script>
+        document.querySelectorAll('.addr-pick').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                document.querySelector('[name=receiver]').value = btn.dataset.receiver || '';
+                document.querySelector('[name=phone]').value = btn.dataset.phone || '';
+                document.querySelector('[name=zipcode]').value = btn.dataset.zipcode || '';
+                document.querySelector('[name=address1]').value = btn.dataset.address1 || '';
+                document.querySelector('[name=address2]').value = btn.dataset.address2 || '';
+            });
+        });
+    </script>
+
+</div>
+</body>
+</html>

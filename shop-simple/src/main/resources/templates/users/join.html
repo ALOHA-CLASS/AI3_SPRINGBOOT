@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main_layout}">
+<head>
+    <title>회원가입</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="auth-box">
+        <h2 class="auth-title">회원가입</h2>
+
+        <form th:action="@{/users/join}" th:object="${joinDto}" method="post" class="form">
+            <div class="field">
+                <label>아이디</label>
+                <input type="text" th:field="*{username}" placeholder="4~50자">
+                <span class="err" th:errors="*{username}"></span>
+            </div>
+            <div class="field">
+                <label>비밀번호</label>
+                <input type="password" th:field="*{password}" placeholder="4자 이상">
+                <span class="err" th:errors="*{password}"></span>
+            </div>
+            <div class="field">
+                <label>이름</label>
+                <input type="text" th:field="*{name}">
+                <span class="err" th:errors="*{name}"></span>
+            </div>
+            <div class="field">
+                <label>이메일</label>
+                <input type="email" th:field="*{email}">
+                <span class="err" th:errors="*{email}"></span>
+            </div>
+            <div class="field">
+                <label>연락처</label>
+                <input type="text" th:field="*{phone}" placeholder="010-0000-0000">
+            </div>
+            <button type="submit" class="btn-fill big">가입하기</button>
+        </form>
+
+        <p class="auth-link">이미 회원이신가요? <a th:href="@{/users/login}">로그인</a></p>
+    </div>
+
+</div>
+</body>
+</html>

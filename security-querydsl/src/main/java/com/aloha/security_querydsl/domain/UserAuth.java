@@ -1,0 +1,36 @@
+package com.aloha.security_querydsl.domain;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+/**
+ * 회원 권한 (ROLE_USER, ROLE_ADMIN, ...)
+ */
+@Entity
+@Table(name = "user_auth")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@ToString(exclude = "user")
+public class UserAuth extends BaseEntity {
+
+  // users:user_auth = 1:N
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_no", nullable = false)
+  private Users user;
+
+  @Column(nullable = false, length = 100)
+  private String auth;
+}

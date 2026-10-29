@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- 페이징 프래그먼트 : page(Page 객체), url(기본 URL) -->
+<th:block th:fragment="paging(page, url)">
+    <nav class="paging" th:if="${page.totalPages > 0}">
+        <a class="pg-btn" th:classappend="${page.first} ? 'disabled'"
+           th:href="@{${url}(page=${page.number - 1})}">이전</a>
+
+        <span class="pg-nums">
+            <a th:each="i : ${#numbers.sequence(0, page.totalPages - 1)}"
+               class="pg-num" th:classappend="${i == page.number} ? 'on'"
+               th:href="@{${url}(page=${i})}" th:text="${i + 1}">1</a>
+        </span>
+
+        <a class="pg-btn" th:classappend="${page.last} ? 'disabled'"
+           th:href="@{${url}(page=${page.number + 1})}">다음</a>
+    </nav>
+</th:block>
+</body>
+</html>

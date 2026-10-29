@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main_layout}">
+<head>
+    <title>장바구니</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="page-head">
+        <h2 class="page-title">CART</h2>
+        <p class="page-desc">장바구니</p>
+    </div>
+
+    <table class="cart-table" th:if="${!items.empty}">
+        <thead>
+            <tr>
+                <th>상품</th>
+                <th>가격</th>
+                <th>수량</th>
+                <th>합계</th>
+                <th>관리</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="item : ${items.content}" th:attr="data-no=${item.no}">
+                <td class="cart-prod">
+                    <a th:href="@{/products/{no}(no=${item.product.no})}">
+                        <img th:src="${item.product.imageUrl}" th:alt="${item.product.name}" class="cart-thumb">
+                        <span th:text="${item.product.name}">상품명</span>
+                    </a>
+                </td>
+                <td th:text="${#numbers.formatInteger(item.product.price, 0, 'COMMA')} + '원'">0원</td>
+                <td>
+                    <form th:action="@{/cart/{no}/update(no=${item.no})}" method="post"
+                          class="qty-form js-qty-form" th:data-no="${item.no}">
+                        <input type="number" name="quantity" th:value="${item.quantity}" min="1">
+                        <button type="submit" class="btn-mini">변경</button>
+                    </form>
+                </td>
+                <td class="item-total" th:text="${#numbers.formatInteger(item.product.price * item.quantity, 0, 'COMMA')} + '원'">0원</td>
+                <td>
+                    <form th:action="@{/cart/{no}/delete(no=${item.no})}" method="post" class="js-delete-form" th:data-no="${item.no}">
+                        <button type="submit" class="btn-mini danger">삭제</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+
+    </table>
+
+    <p class="empty" th:if="${items.empty}">장바구니가 비어 있습니다.</p>
+
+    <!-- 페이징 -->
+    <th:block th:replace="~{fragments/paging :: paging(${items}, '/cart')}"></th:block>
+
+    <div class="cart-summary" th:if="${!items.empty}">
+        <p class="total">총 결제금액 <b class="cart-total-value" th:text="${#numbers.formatInteger(totalPrice, 0, 'COMMA')} + '원'">0원</b></p>
+        <a th:href="@{/orders/checkout}" class="btn-fill big">주문하기</a>
+    </div>
+
+    <!-- 수량변경(PUT) / 삭제(DELETE) - 비동기 fetch 요청 -->
+    <script th:inline="none">
+    const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+    const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+
+    function formatWon(n) {
+        return Number(n).toLocaleString('ko-KR') + '원';
+    }
+
+    // 헤더의 장바구니 뱃지 수량 갱신
+    function updateCartBadge(count) {
+        const badge = document.querySelector('.util .cart .count');
+        if (badge) badge.textContent = count;
+    }
+
+    // ===== 수량 변경 : PUT /cart/{no} =====
+    document.querySelectorAll('.js-qty-form').forEach(function (form) {
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault(); // 기본 submit 막기
+
+            const no = form.dataset.no;
+            const quantity = Number(form.querySelector('[name="quantity"]').value) || 1;
+
+            try {
+                const response = await fetch(`/cart/${no}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        [csrfHeader]: csrfToken
+                    },
+                    body: JSON.stringify({ quantity: quantity })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    form.closest('tr').querySelector('.item-total').textContent = formatWon(data.itemTotal);
+                    document.querySelector('.cart-total-value').textContent = formatWon(data.cartTotal);
+                    updateCartBadge(data.cartCount);
+                } else {
+                    const data = await response.json();
+                    alert(data.message || '수량 변경에 실패했습니다.');
+                }
+            } catch (err) {
+                alert(err.message);
+            }
+        });
+    });
+
+    // ===== 삭제 : DELETE /cart/{no} =====
+    document.querySelectorAll('.js-delete-form').forEach(function (form) {
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault(); // 기본 submit 막기
+            if (!confirm('장바구니에서 삭제하시겠습니까?')) return;
+
+            const no = form.dataset.no;
+
+            try {
+                const response = await fetch(`/cart/${no}`, {
+                    method: 'DELETE',
+                    headers: {
+                        [csrfHeader]: csrfToken
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    form.closest('tr').remove();
+                    document.querySelector('.cart-total-value').textContent = formatWon(data.cartTotal);
+                    updateCartBadge(data.cartCount);
+
+                    // 담긴 상품이 하나도 없으면 빈 화면(페이징 등)을 위해 새로고침
+                    if (!document.querySelector('.cart-table tbody tr')) {
+                        location.reload();
+                    }
+                } else {
+                    const data = await response.json();
+                    alert(data.message || '삭제에 실패했습니다.');
+                }
+            } catch (err) {
+                alert(err.message);
+            }
+        });
+    });
+    </script>
+
+</div>
+
+</body>
+</html>

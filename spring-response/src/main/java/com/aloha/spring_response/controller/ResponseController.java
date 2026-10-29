@@ -95,7 +95,7 @@ public class ResponseController {
      * - Map 컬렉션을 JSON 형식으로 변환하여, 
      *   key 에 대한 value 로 다양한 객체들을 계층적인 구조로 HTTP 응답 본문에 지정한다.
      * ✅ 상태코드 : 200 OK
-     * ✅ body : {"student":{"name":"김조은","age":20,"studentId":1001,"grade":"1"},"person":{"name":"김조은","age":20},"board":{"boardNo":0,"title":"제목","writer":"작성자","content":"내용","regDate":null,"updDate":null,"views":0}}
+     * ✅ body : {"student":{"name":"알로하","age":20,"studentId":1001,"grade":"1"},"person":{"name":"알로하","age":20},"board":{"boardNo":0,"title":"제목","writer":"작성자","content":"내용","regDate":null,"updDate":null,"views":0}}
      * @return
      */
     @GetMapping("/map")

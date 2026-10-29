@@ -89,6 +89,26 @@
             "projectName": "pagehelper",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ShopSimpleApplication<shop-simple>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.aloha.shop.ShopSimpleApplication",
+            "projectName": "shop-simple",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-QuerydslApiApplication<querydsl>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.aloha.querydsl.QuerydslApiApplication",
+            "projectName": "querydsl",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }

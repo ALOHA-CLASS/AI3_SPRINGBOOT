@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main_layout}">
+<head>
+    <title>배송지 관리</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <div class="page-head">
+        <h2 class="page-title">배송지 관리</h2>
+    </div>
+
+    <p class="flash" th:if="${message}" th:text="${message}"></p> 
+
+    <!-- 배송지 목록 -->
+    <ul class="address-list" th:if="${!#lists.isEmpty(addresses)}">
+        <li th:each="a : ${addresses}" class="address-item">
+            <div class="ai-info">
+                <b th:text="${a.receiver}">받는분</b>
+                <em class="badge" th:if="${a.defaultAddress}">기본배송지</em>
+                <p th:text="${a.phone}">연락처</p>
+                <p>
+                    <span th:text="${a.zipcode}">우편</span>
+                    <span th:text="${a.address1}">주소</span>
+                    <span th:text="${a.address2}">상세</span>
+                </p>
+            </div>
+            <form th:action="@{/users/mypage/address/{no}/delete(no=${a.no})}" method="post">
+                <button type="submit" class="btn-mini danger">삭제</button>
+            </form>
+        </li>
+    </ul>
+    <p class="empty" th:if="${#lists.isEmpty(addresses)}">등록된 배송지가 없습니다.</p>
+
+    <!-- 배송지 추가 -->
+    <div class="auth-box">
+        <h3 class="sub-title">새 배송지 추가</h3>
+        <form th:action="@{/users/mypage/address}" th:object="${addressDto}" method="post" class="form">
+            <div class="field">
+                <label>받는 분</label>
+                <input type="text" th:field="*{receiver}">
+                <span class="err" th:errors="*{receiver}"></span>
+            </div>
+            <div class="field">
+                <label>연락처</label>
+                <input type="text" th:field="*{phone}">
+            </div>
+            <div class="field">
+                <label>우편번호</label>
+                <input type="text" th:field="*{zipcode}" readonly placeholder="주소 찾기를 클릭하세요">
+                <button type="button" class="btn-mini" onclick="searchAddress()">주소 찾기</button>
+            </div>
+            <div class="field">
+                <label>기본주소</label>
+                <input type="text" th:field="*{address1}" readonly placeholder="주소 찾기를 클릭하세요">
+                <span class="err" th:errors="*{address1}"></span>
+            </div>
+            <div class="field">
+                <label>상세주소</label>
+                <input type="text" th:field="*{address2}">
+            </div>
+            <label class="check">
+                <input type="checkbox" th:field="*{defaultAddress}"> 기본 배송지로 설정
+            </label>
+            <button type="submit" class="btn-fill big">배송지 추가</button>
+        </form>
+    </div>
+
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script>
+        function searchAddress() {
+            new daum.Postcode({
+                oncomplete: function (data) {
+                    // 사용자가 선택한 주소 타입에 맞춰 기본 주소를 구성
+                    const addr = data.userSelectedType === 'R' ? data.roadAddress : data.jibunAddress;
+
+                    document.getElementById('zipcode').value = data.zonecode;
+                    document.getElementById('address1').value = addr;
+                    document.getElementById('address2').focus();
+                }
+            }).open();
+        }
+    </script>
+
+</div>
+</body>
+</html>

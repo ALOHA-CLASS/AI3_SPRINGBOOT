@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/main_layout}">
+<head>
+  <title>회원가입</title>
+</head>
+<body layout:fragment="content">
+  <div class="auth-box">
+    <h2 class="auth-title">회원가입</h2>
+
+    <form th:action="@{/users/join}" method="post" class="form" th:object="${joinDto}" id="joinForm" onsubmit="return validateJoinForm()">
+      <div class="field">
+        <label for="username">아이디</label>
+        <div class="btn-row">
+          <input type="text" th:field="*{username}" placeholder="4~50자 내로 입력하세요.">
+          <button type="button" class="btn-mini" onclick="checkUsername()">중복확인</button>
+        </div>
+        <span class="err" th:errors="*{username}"></span>
+        <span class="ok" id="usernameMsg"></span>
+      </div>
+      <div class="field">
+        <label for="password">비밀번호</label>
+        <input type="password" th:field="*{password}" placeholder="6자리 이상 입력하세요.">
+        <span class="err" th:errors="*{password}"></span>
+      </div>
+      <div class="field">
+        <label for="passwordConfirm">비밀번호 확인</label>
+        <input type="password" th:field="*{passwordConfirm}" placeholder="비밀번호를 다시 입력하세요.">
+        <span class="err" th:errors="*{passwordConfirm}"></span>
+        <span class="ok" id="passwordConfirmMsg"></span>
+      </div>
+      <div class="field">
+        <label for="name">이름</label>
+        <input type="text" th:field="*{name}" placeholder="이름">
+        <span class="err" th:errors="*{name}"></span>
+      </div>
+      <div class="field">
+        <label for="email">이메일</label>
+        <input type="text" th:field="*{email}" placeholder="이메일">
+        <span class="err" th:errors="*{email}"></span>
+      </div>
+      <div class="field">
+        <label for="phone">연락처</label>
+        <input type="text" th:field="*{phone}" placeholder="연락처 ex) 010-0000-0000">
+      </div>
+      <button type="submit" class="btn-fill big">회원가입</button>
+    </form>
+    <p class="auth-link">이미 회원이신가요? <a th:href="@{/users/login}">로그인</a></p>
+  </div>
+
+  <script>
+    // 아이디 중복확인 여부 (true 가 될 때까지 회원가입 제출을 막는다)
+    let isUsernameChecked = false
+    // 중복확인을 통과한 아이디 값 (중복확인 이후 아이디를 변경하면 다시 확인하도록 비교)
+    let checkedUsername = ""
+
+    // ==========================================
+    // 아이디 중복확인
+    // GET /api/users/check-username
+    // ==========================================
+    async function checkUsername() {
+      const username = $("#username").val().trim()
+      if (!username) {
+        isUsernameChecked = false
+        return $toast({ title: "아이디를 입력하세요.", icon: "warning" })
+      }
+
+      try {
+        const available = await $ajax({
+          url: "/api/users/check-username",
+          method: "GET",
+          data: { username: username }
+        })
+
+        if (available) {
+          isUsernameChecked = true
+          checkedUsername = username
+          $("#usernameMsg").text("사용 가능한 아이디입니다.")
+        } else {
+          isUsernameChecked = false
+          checkedUsername = ""
+          $("#usernameMsg").text("")
+          $toast({ title: "이미 사용 중인 아이디입니다.", icon: "warning" })
+        }
+      } catch (error) {
+        console.error(error)
+        $toast({ title: "중복확인에 실패했습니다.", icon: "error" })
+      }
+    }
+
+    // 아이디를 다시 수정하면 중복확인 결과를 초기화
+    $("#username").on("input", function () {
+      if ($(this).val().trim() !== checkedUsername) {
+        isUsernameChecked = false
+        $("#usernameMsg").text("")
+      }
+    })
+
+    // ==========================================
+    // 비밀번호 / 비밀번호 확인 일치여부 (키보드 입력마다 확인)
+    // ==========================================
+    function checkPasswordMatch() {
+      const password = $("#password").val()
+      const passwordConfirm = $("#passwordConfirm").val()
+
+      if (!passwordConfirm) {
+        $("#passwordConfirmMsg").text("")
+        return
+      }
+      if (password === passwordConfirm) {
+        $("#passwordConfirmMsg").text("비밀번호가 일치합니다.")
+      } else {
+        $("#passwordConfirmMsg").text("비밀번호가 일치하지 않습니다.")
+      }
+    }
+    $("#password, #passwordConfirm").on("keyup", checkPasswordMatch)
+
+    // ==========================================
+    // 회원가입 제출 전 최종 유효성 검사
+    // ==========================================
+    function validateJoinForm() {
+      const username = $("#username").val().trim()
+      const password = $("#password").val()
+      const passwordConfirm = $("#passwordConfirm").val()
+
+      // 아이디 중복확인을 하지 않았거나, 확인 이후 아이디를 변경한 경우
+      if (!isUsernameChecked || username !== checkedUsername) {
+        $toast({ title: "아이디 중복확인을 해주세요.", icon: "warning" })
+        return false
+      }
+      if (password !== passwordConfirm) {
+        $toast({ title: "비밀번호가 일치하지 않습니다.", icon: "warning" })
+        return false
+      }
+      return true
+    }
+  </script>
+</body>
+</html>
